@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* Palette taken from the Gulshan-e-Harmain logo: leaf greens, Kaaba black, desert-gold */
+@theme {
+    --font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
+    --color-brand-50: #f0faf1;
+    --color-brand-100: #dcf3de;
+    --color-brand-200: #bbe5c0;
+    --color-brand-500: #2f9e44;
+    --color-brand-600: #22863a;
+    --color-brand-700: #1a6e2f;
+    --color-brand-800: #14562a;
+    --color-brand-900: #0c3a1c;
+    --color-brand-950: #07260f;
+    --color-gold: #b8893f;
+    --color-gold-light: #e2c07a;
+}
+
+@layer base {
+    html { font-family: var(--font-sans); font-feature-settings: 'cv11', 'ss01'; }
+    body { @apply bg-slate-50 text-slate-800 antialiased; }
+    h1, h2, h3, h4 { letter-spacing: -0.01em; }
+}
+
+@layer components {
+    .card { @apply bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(16,24,40,.04)]; }
+    .card-h { @apply px-5 py-3.5 border-b border-slate-100 font-semibold text-slate-900 flex items-center justify-between gap-2; }
+    .card-b { @apply p-5; }
+    .btn { @apply inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition cursor-pointer border border-transparent; }
+    .btn-primary { @apply bg-brand-700 text-white shadow-sm hover:bg-brand-800; }
+    .btn-gold { @apply bg-gold text-white shadow-sm hover:brightness-95; }
+    .btn-light { @apply bg-white border-slate-300 text-slate-700 hover:bg-slate-50; }
+    .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
+    .btn-sm { @apply px-2.5 py-1 text-xs; }
+    .inp { @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-600; }
+    .lbl { @apply block text-sm font-medium text-slate-700 mb-1.5; }
+    .hint { @apply text-xs text-slate-500 mt-1; }
+    .card-sub { @apply text-sm font-normal text-slate-500; }
+    .form-bar { @apply sticky bottom-0 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 bg-white/95 backdrop-blur border-t border-slate-200 flex items-center gap-3 z-10; }
+    .tbl { @apply w-full text-sm; }
+    .tbl th { @apply text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-50 px-4 py-2.5; }
+    .tbl td { @apply px-4 py-3 border-t border-slate-100 align-middle; }
+    .tbl tbody tr:hover { @apply bg-brand-50/50; }
+    .badge { @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-medium; }
+}
+
+/* ---- Dashboard motion ---- */
+@keyframes rise { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes wave { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 30% { transform: rotate(-10deg); } 45% { transform: rotate(14deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(8deg); } }
+.rise { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; animation-delay: var(--d, 0ms); }
+.bar-grow { transform-origin: left; animation: grow 1.3s cubic-bezier(.2, .7, .2, 1) both; animation-delay: .3s; }
+.lift { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.lift:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -12px rgba(12, 58, 28, .25); border-color: rgb(187 229 192); }
+#live.settled .rise, #live.settled .bar-grow { animation: none; }
+@media (prefers-reduced-motion: reduce) { .rise, .bar-grow { animation: none; } .lift:hover { transform: none; } }
+
+/* Empty-state motion: a soft light sweeps around each ring while there is no data yet */
+@keyframes spin { to { transform: rotate(360deg); } }
+.ring-wait { position: absolute; inset: 0; border-radius: 9999px; pointer-events: none;
+  background: conic-gradient(from 0deg, transparent 0 72%, var(--c) 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
+  opacity: .55; animation: spin 2.6s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ring-wait { animation: none; } }
+
+/* highlighted search matches */
+mark.hl { background: #fde68a; color: inherit; border-radius: 3px; padding: 0 1px; }
+
+.tbl-compact th, .tbl-compact td { padding-left: .65rem; padding-right: .65rem; }
