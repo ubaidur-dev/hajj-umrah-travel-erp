@@ -56,7 +56,7 @@ class BookingController extends Controller
             $q->whereColumn('paid_total', '<', 'net_total')->where('status', '!=', 'cancelled');
         }
 
-        return view('bookings.index', ['bookings' => $q->latest('booking_date')->latest('id')->paginate(20)->withQueryString()]);
+        return view('bookings.index', ['bookings' => $q->latest('booking_date')->latest('id')->paginate(10)->withQueryString()]);
     }
 
     public function create(Request $r)
