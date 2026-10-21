@@ -78,7 +78,7 @@
 
 <div class="lg:flex">
   {{-- ============ Sidebar ============ --}}
-  <aside class="bg-gradient-to-b from-brand-900 to-brand-950 text-emerald-50 w-64 shrink-0 fixed lg:sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 -translate-x-full peer-checked:translate-x-0 lg:translate-x-0 transition">
+  <aside class="bg-gradient-to-b from-brand-900 to-brand-950 text-emerald-50 w-64 shrink-0 flex flex-col fixed lg:sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 -translate-x-full peer-checked:translate-x-0 lg:translate-x-0 transition">
     <nav class="p-3 space-y-1 pt-5">
       @foreach($nav as [$route, $label, $icon])
         @php $active = request()->routeIs(Str::before($route, '.').'*') || request()->routeIs($route); @endphp
@@ -87,7 +87,7 @@
         </a>
       @endforeach
     </nav>
-    <div class="p-4 mt-4 text-[11px] text-emerald-200/50">© {{ date('Y') }} {{ \App\Support\Setting::get('agency_name', 'Gulshan-e-Harmain') }}</div>
+    <div class="mt-auto px-5 py-4 border-t border-white/10 text-center text-[11px] text-emerald-200/60">© {{ date('Y') }} {{ \App\Support\Setting::get('agency_name', 'Gulshan-e-Harmain') }}</div>
   </aside>
   <label for="menu" class="fixed inset-0 top-16 bg-black/40 z-20 hidden peer-checked:block lg:hidden"></label>
 
