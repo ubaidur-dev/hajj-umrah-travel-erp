@@ -21,7 +21,7 @@ class InvoiceController extends Controller
             'customer' => ['name', 'phone', 'cnic', 'passport_no'], 'booking' => ['booking_no', 'title'],
         ], ['invoice_no', '(select name from customers where customers.id = invoices.customer_id)']);
 
-        return view('invoices.index', ['invoices' => $q->latest('issue_date')->latest('id')->paginate(20)->withQueryString()]);
+        return view('invoices.index', ['invoices' => $q->latest('issue_date')->latest('id')->paginate(10)->withQueryString()]);
     }
 
     public function create()
