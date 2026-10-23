@@ -33,7 +33,7 @@ class ExpenseController extends Controller
         }
         $total = (clone $q)->reorder()->sum('amount');
 
-        return view('expenses.index', ['categories' => collect(array_keys(Expense::CATEGORIES))->merge(Expense::query()->distinct()->pluck('category'))->unique()->values(), 'expenses' => $q->latest('expense_date')->latest('id')->paginate(25)->withQueryString(), 'total' => $total]);
+        return view('expenses.index', ['categories' => collect(array_keys(Expense::CATEGORIES))->merge(Expense::query()->distinct()->pluck('category'))->unique()->values(), 'expenses' => $q->latest('expense_date')->latest('id')->paginate(10)->withQueryString(), 'total' => $total]);
     }
 
     public function create(Request $r)
