@@ -29,7 +29,11 @@ class CustomerController extends Controller
         $q = Customer::query()->withCount('bookings');
         Search::apply($q, $r->q, ['name', 'phone', 'whatsapp', 'email', 'cnic', 'passport_no', 'city', 'address'], [], ['name', 'phone', 'cnic', 'passport_no']);
 
-        return view('customers.index', ['customers' => $q->latest('id')->paginate(20)->withQueryString()]);
+        if ($r->city) {
+            $q->where('city', $r->city);
+        }
+
+        return view('customers.index', ['cities' => Customer::whereNotNull('city')->where('city', '!=', '')->distinct()->orderBy('city')->pluck('city'), 'customers' => $q->latest('id')->paginate(10)->withQueryString()]);
     }
 
     /** Used by the "Add new customer" pop-up inside the booking form. */
