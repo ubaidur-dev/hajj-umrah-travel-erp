@@ -28,7 +28,7 @@ class PaymentController extends Controller
         }
         $total = (clone $q)->reorder()->sum('amount');
 
-        return view('payments.index', ['payments' => $q->latest('paid_at')->latest('id')->paginate(25)->withQueryString(), 'total' => $total, 'methods' => Payment::METHODS]);
+        return view('payments.index', ['payments' => $q->latest('paid_at')->latest('id')->paginate(10)->withQueryString(), 'total' => $total, 'methods' => Payment::METHODS]);
     }
 
     public function store(Request $r, Booking $booking)
