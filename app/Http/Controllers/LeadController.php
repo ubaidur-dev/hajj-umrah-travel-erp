@@ -37,7 +37,7 @@ class LeadController extends Controller
         }
 
         return view('leads.index', [
-            'leads' => $q->orderByRaw('next_follow_up is null')->orderBy('next_follow_up')->latest('id')->paginate(20)->withQueryString(),
+            'leads' => $q->orderByRaw('next_follow_up is null')->orderBy('next_follow_up')->latest('id')->paginate(10)->withQueryString(),
             'dueCount' => Lead::whereNotIn('status', ['won', 'lost'])->whereDate('next_follow_up', '<=', today())->count(),
         ]);
     }
@@ -67,7 +67,6 @@ class LeadController extends Controller
         return redirect()->route('leads.index')->with('ok', 'Lead deleted.');
     }
 
-    /** Turn an inquiry into a customer and start a booking for them. */
     public function convert(Lead $lead)
     {
         $customer = $lead->customer ?? Customer::create(['name' => $lead->name, 'phone' => $lead->phone, 'notes' => $lead->notes]);
