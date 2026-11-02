@@ -12,10 +12,8 @@ use Illuminate\Http\Request;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-/** One place for every upload in the system (all files go through Spatie Media Library). */
 class MediaController extends Controller
 {
-    /** model key => [class, collection, allow pdf] */
     protected function map(): array
     {
         return [
