@@ -24,3 +24,28 @@
   </form>
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = id => document.getElementById('f_' + id), cur = $('current_password'), pw = $('password'), cf = $('password_confirmation');
+  const say = (el, text, ok) => {
+    const box = el.closest('[data-field]');
+    box.querySelectorAll('.text-red-600:not([data-live])').forEach(n => n.remove());
+    let p = box.querySelector('[data-live]');
+    if (!text) return p?.remove();
+    if (!p) { p = document.createElement('p'); p.dataset.live = ''; box.appendChild(p); }
+    p.className = 'text-xs mt-1 ' + (ok ? 'text-brand-700' : 'text-red-600');
+    p.textContent = text;
+  };
+  const checkNew = () => {
+    say(pw, pw.value && pw.value.length < 6 ? 'Your new password must be at least 6 characters.' : '');
+    if (!cf.value) return say(cf, '');
+    const same = pw.value === cf.value;
+    say(cf, same ? 'Passwords match.' : 'Your new password and confirmation do not match.', same);
+  };
+  cur.addEventListener('input', () => say(cur, '')); 
+  pw.addEventListener('input', checkNew);
+  cf.addEventListener('input', checkNew);
+});
+</script>
+@endpush
