@@ -138,7 +138,6 @@ class BookingController extends Controller
         return redirect()->route('bookings.index')->with('ok', 'Booking deleted.');
     }
 
-    /** Pending -> Confirmed. Auto-creates invoice and takes you to the slip. */
     public function confirm(Booking $booking)
     {
         if ($booking->items()->count() === 0) {
@@ -178,7 +177,6 @@ class BookingController extends Controller
             : $pdf->stream("Slip-{$booking->booking_no}.pdf");
     }
 
-    // ---- Travelers -----------------------------------------------------
     public function addTraveler(Request $r, Booking $booking)
     {
         $data = $r->validate([
@@ -192,7 +190,6 @@ class BookingController extends Controller
         return back()->with('ok', 'Traveler added.');
     }
 
-    /** Quick inline edit (visa status, visa number, ticket number) — saved without reloading the page. */
     public function updateTraveler(Request $r, Booking $booking, $traveler)
     {
         $t = $booking->travelers()->findOrFail($traveler);
@@ -211,7 +208,6 @@ class BookingController extends Controller
         return back()->with('ok', 'Traveler removed.');
     }
 
-    // ---- helpers -------------------------------------------------------
     protected function lookups(): array
     {
         return [
