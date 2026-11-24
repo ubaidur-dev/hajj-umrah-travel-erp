@@ -27,14 +27,13 @@
 @endphp
 <input type="checkbox" id="menu" class="peer hidden">
 
-{{-- ============ Top header ============ --}}
 <header class="bg-white sticky top-0 z-40 h-16 border-b-2 border-gold shadow-sm">
   <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
     <div class="flex items-center gap-3 lg:gap-4 min-w-0">
       <label for="menu" class="lg:hidden btn btn-light !px-2.5 !py-2" aria-label="Menu">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg></label>
       <a href="{{ route('dashboard') }}" class="flex items-center gap-3 min-w-0">
-        <img src="{{ agency_logo_url() }}" alt="Gulshan-e-Harmain" class="h-10 w-10 lg:h-12 lg:w-12 shrink-0 drop-shadow-sm">
+        <img data-agency-logo src="{{ agency_logo_url() }}" alt="Gulshan-e-Harmain" class="h-10 w-10 lg:h-12 lg:w-12 shrink-0 drop-shadow-sm">
         <span class="min-w-0 leading-tight">
           <span class="block text-base lg:text-lg font-bold text-brand-800 truncate">{{ \App\Support\Setting::get('agency_name', 'Gulshan-e-Harmain') }}</span>
           <span class="block text-[11px] lg:text-xs font-semibold text-gold truncate">{{ \App\Support\Setting::get('agency_tagline', '(Travel Consultant Hajj & Umrah)') }}</span>
@@ -77,7 +76,6 @@
 </header>
 
 <div class="lg:flex">
-  {{-- ============ Sidebar ============ --}}
   <aside class="bg-gradient-to-b from-brand-900 to-brand-950 text-emerald-50 w-64 shrink-0 flex flex-col fixed lg:sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 -translate-x-full peer-checked:translate-x-0 lg:translate-x-0 transition">
     <nav class="p-3 space-y-1 pt-5">
       @foreach($nav as [$route, $label, $icon])
@@ -100,7 +98,6 @@
   </div>
 </div>
 <script>
-  // close the profile dropdown when clicking elsewhere
   document.addEventListener('click', e => { const d = document.getElementById('userMenu'); if (d && !d.contains(e.target)) d.removeAttribute('open'); });
 </script>
 @stack('scripts')
