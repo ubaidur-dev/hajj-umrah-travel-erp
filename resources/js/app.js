@@ -1,9 +1,9 @@
 import Chart from 'chart.js/auto';
 window.Chart = Chart;
+import './i18n';
 
 const csrf = () => document.querySelector('meta[name=csrf-token]')?.content;
 
-/* ---------- Toast notifications (top-right, disappear by themselves) ---------- */
 const ICONS = {
     success: 'M5 13l4 4L19 7',
     error: 'M6 18L18 6M6 6l12 12',
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (f?.dataset.invalid) toast('Please fix the highlighted fields.', 'error', 6000);
 });
 
-/* ---------- Confirm + double-submit protection ---------- */
 document.addEventListener('submit', (e) => {
     const form = e.target;
     const msg = form.dataset.confirm;
@@ -51,7 +50,6 @@ document.addEventListener('submit', (e) => {
     }
 });
 
-/* ---------- Forms that save without reloading: <form data-ajax> ---------- */
 async function ajaxSubmit(form) {
     try {
         const res = await fetch(form.action, {
@@ -64,15 +62,12 @@ async function ajaxSubmit(form) {
     } catch (err) { toast(err.message, 'error'); }
 }
 document.addEventListener('change', (e) => {
-    if (e.target.matches('[data-autosave]')) e.target.closest('form').requestSubmit();
+    if (e.target.matches('[data-autosave]')) (e.target.form || e.target.closest('form'))?.requestSubmit();
 });
 
-/* ---------- Live search & filters: <form data-auto> ----------
-   Results update while you type (no page reload), the URL stays shareable, best matches come first. */
 const SEP = '[\\s\\-+.\\/()_]*';
 const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** Highlights what was typed inside the live results. Dashes/spaces in numbers do not matter. */
 function highlight(root, term) {
     root.querySelectorAll('mark.hl').forEach((m) => m.replaceWith(document.createTextNode(m.textContent)));
     root.normalize();
@@ -120,14 +115,23 @@ document.querySelectorAll('form[data-auto]').forEach((form) => {
         new FormData(form).forEach((v, k) => { if (String(v).trim() !== '') p.append(k, v); });
         return (form.getAttribute('action') || location.pathname) + (p.toString() ? '?' + p : '');
     };
-    const run = () => liveLoad(urlFor(), q?.value || '');
+    const run = () => { sync(); liveLoad(urlFor(), q?.value || ''); };
+    const reset = form.querySelector('[data-reset]'), from = form.querySelector('[name=from]'), to = form.querySelector('[name=to]');
+    const sync = () => {
+        if (reset) reset.hidden = ![...new FormData(form)].some(([, v]) => String(v).trim() !== '');
+        if (from && to) { to.min = from.value; from.max = to.value; }
+    };
+    reset?.addEventListener('click', () => {
+        form.querySelectorAll('input, select').forEach((el) => { if (el.type === 'checkbox') el.checked = false; else el.value = ''; });
+        run(); q?.focus();
+    });
+    sync();
     let t;
     form.addEventListener('submit', (e) => { e.preventDefault(); run(); });
     form.addEventListener('change', run);
     form.addEventListener('input', (e) => {
-        if (e.target === q) { clearTimeout(t); t = setTimeout(run, 120); }
+        if (e.target === q) { sync(); clearTimeout(t); t = setTimeout(run, 120); }
     });
-    // pagination inside the results also stays on the page
     document.addEventListener('click', (e) => {
         const a = e.target.closest('[data-live] nav a[href*="page="], [data-live] a[rel="next"], [data-live] a[rel="prev"]');
         if (!a) return;
@@ -139,7 +143,6 @@ document.querySelectorAll('form[data-auto]').forEach((form) => {
     }
 });
 
-/* ---------- Search suggestions (type-ahead box under the search field) ---------- */
 document.querySelectorAll('input[data-suggest]').forEach((input) => {
     const scope = input.dataset.suggest;
     const wrap = document.createElement('div'); wrap.className = 'relative'; input.replaceWith(wrap); wrap.append(input);
@@ -182,7 +185,7 @@ document.querySelectorAll('input[data-suggest]').forEach((input) => {
         try {
             const res = await fetch(`/search/suggest?scope=${encodeURIComponent(scope)}&q=${encodeURIComponent(term)}`, { signal: ctl.signal, headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
             items = await res.json(); active = -1; paint(); box.classList.remove('hidden');
-        } catch (e) { /* aborted */ }
+        } catch (e) { }
     };
     input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(fetchHints, 120); });
     input.addEventListener('focus', () => { if (input.value.trim()) fetchHints(); });
@@ -198,7 +201,6 @@ document.querySelectorAll('input[data-suggest]').forEach((input) => {
     document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
 });
 
-/* ---------- Uploader (Spatie Media Library on the server) ---------- */
 const PDF_ICON = '<svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM14 3v5h5"/></svg>';
 
 function tile(u, item) {
@@ -211,13 +213,14 @@ function tile(u, item) {
         <div class="px-2 py-1.5 text-[11px] text-slate-600 truncate" data-name></div>
         <div data-progress class="hidden absolute inset-x-0 bottom-0 h-1 bg-brand-100"><div class="h-full bg-brand-600 w-0 transition-all"></div></div>
         <button type="button" title="Remove" class="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/60 hover:bg-red-600 text-white text-sm leading-none opacity-100 sm:opacity-0 group-hover:opacity-100 transition">×</button>`;
+    if (item.is_image && item.url) el.querySelector('a').addEventListener('click', (e) => { e.preventDefault(); window.openLightbox(item.url); });
     el.querySelector('[data-name]').textContent = item.name + (item.size ? ` · ${item.size}` : '');
     el.querySelector('button').onclick = () => removeTile(u, el, item);
     return el;
 }
 
 async function removeTile(u, el, item) {
-    if (item.local) { item.local(); return; }                       // deferred file not yet uploaded
+    if (item.local) { item.local(); return; }
     if (!item.delete || !confirm('Remove this file?')) return;
     const res = await fetch(item.delete, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrf(), Accept: 'application/json' } });
     if (!res.ok) return toast('Could not remove the file', 'error');
@@ -257,7 +260,6 @@ function uploadFiles(u, files) {
 }
 
 function renderDeferred(u, input) {
-    // Files stay inside the <input>, so they are posted together with the surrounding form.
     const tiles = u.querySelector('[data-tiles]');
     tiles.querySelectorAll('[data-local]').forEach((t) => t.remove());
     const dt = new DataTransfer();
@@ -293,38 +295,66 @@ document.querySelectorAll('[data-uploader]').forEach((u) => {
     drop.addEventListener('drop', (e) => handle(e.dataTransfer.files));
 });
 
-/* ---------- Pakistani CNIC mask: 12345-1234567-1 ---------- */
 document.addEventListener('input', (e) => {
     if (!e.target.matches('[data-cnic]')) return;
     const d = e.target.value.replace(/\D/g, '').slice(0, 13);
     e.target.value = [d.slice(0, 5), d.slice(5, 12), d.slice(12)].filter(Boolean).join('-');
 });
 
-/* ---------- Pakistani input masks ---------- */
 const phoneMask = (raw) => {
     let d = raw.replace(/\D/g, '');
-    if (d && d[0] !== '0') d = '0' + d;                 // always starts with 0
-    if (d.length > 1 && d[1] !== '3') d = d[0] + d.slice(2); // mobile numbers start with 03
+    if (d && d[0] !== '0') d = '0' + d;
+    if (d.length > 1 && d[1] !== '3') d = d[0] + d.slice(2);
     d = d.slice(0, 11);
     return d.length > 4 ? d.slice(0, 4) + '-' + d.slice(4) : d;
 };
 document.addEventListener('input', (e) => {
     const el = e.target;
     if (el.matches('[data-phone]')) el.value = phoneMask(el.value);
-    else if (el.matches('[data-phones]')) {                 // up to two numbers, e.g. 0341-2185055, 0333-3002438
+    else if (el.matches('[data-phones]')) {
         const [first, second = ''] = el.value.split(',');
         const a = phoneMask(first), b = phoneMask(second);
         el.value = el.value.includes(',') ? a + ',' + (b ? ' ' + b : '') : a;
-    } else if (el.matches('[data-passport]')) {             // 2 letters + 7 digits
+    } else if (el.matches('[data-passport]')) {
         let out = '';
         for (const ch of el.value.toUpperCase()) {
             if (out.length < 2 ? /[A-Z]/.test(ch) : (out.length < 9 && /\d/.test(ch))) out += ch;
         }
         el.value = out;
-    } else if (el.matches('[data-email]')) {                // nothing can be typed after .com
+    } else if (el.matches('[data-email]')) {
         let v = el.value.toLowerCase().replace(/\s/g, '');
         const i = v.indexOf('.com', v.indexOf('@') + 1);
         if (v.includes('@') && i > 0) v = v.slice(0, i + 4);
         el.value = v;
     }
 });
+
+document.addEventListener('input', e => {
+    const box = e.target.closest?.('[data-field]');
+    const eye = box?.querySelector('[data-eye]');
+    if (eye && e.target.matches('input[type=password], input[data-pw]')) eye.hidden = e.target.value === '';
+});
+document.addEventListener('click', e => {
+    const eye = e.target.closest('[data-eye]');
+    if (!eye) return;
+    const input = eye.parentElement.querySelector('input');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    input.dataset.pw = '1';
+    eye.querySelector('[data-eye-on]').classList.toggle('hidden', show);
+    eye.querySelector('[data-eye-off]').classList.toggle('hidden', !show);
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+});
+
+window.openLightbox = (url) => {
+    const o = document.createElement('div');
+    o.className = 'fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md opacity-0 transition-opacity duration-200';
+    o.innerHTML = '<button type="button" aria-label="Close" class="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><img alt="" class="max-h-[90vh] max-w-[92vw] scale-95 rounded-2xl bg-white object-contain shadow-2xl transition-transform duration-200">';
+    const img = o.querySelector('img'); img.src = url;
+    const esc = (e) => { if (e.key === 'Escape') close(); };
+    const close = () => { o.classList.add('opacity-0'); img.classList.add('scale-95'); document.removeEventListener('keydown', esc); setTimeout(() => o.remove(), 200); };
+    o.addEventListener('click', (e) => { if (e.target !== img) close(); });
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(o);
+    requestAnimationFrame(() => { o.classList.remove('opacity-0'); img.classList.remove('scale-95'); });
+};
