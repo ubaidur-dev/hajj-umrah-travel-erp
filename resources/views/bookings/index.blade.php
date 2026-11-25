@@ -6,9 +6,10 @@
     <input name="q" value="{{ request('q') }}" placeholder="Booking no, name, mobile, passport…" class="inp w-72" data-suggest="bookings" autocomplete="off" spellcheck="false">
     <select name="service" class="inp w-36"><option value="">All services</option>@foreach(\App\Http\Controllers\PackageController::TYPES as $k=>$v)<option value="{{ $k }}" @selected(request('service')==$k)>{{ $v }}</option>@endforeach</select>
     <select name="status" class="inp w-36"><option value="">All statuses</option>@foreach(\App\Models\Booking::STATUSES as $k=>$v)<option value="{{ $k }}" @selected(request('status')==$k)>{{ $v }}</option>@endforeach</select>
-    <input type="date" name="from" value="{{ request('from') }}" class="inp w-40"><input type="date" name="to" value="{{ request('to') }}" class="inp w-40">
+    <label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">From<input type="date" name="from" value="{{ request('from') }}" class="inp w-40"></label><label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">To<input type="date" name="to" value="{{ request('to') }}" class="inp w-40"></label>
     <label class="text-sm flex items-center gap-1 pb-2"><input type="checkbox" name="due" value="1" @checked(request('due'))> Outstanding only</label>
-    <button class="btn btn-light">Filter</button>
+    <label class="text-sm flex items-center gap-1 pb-2"><input type="checkbox" name="overdue" value="1" @checked(request('overdue'))> Overdue only</label>
+    <button type="button" data-reset hidden class="btn btn-light !text-red-600 hover:!bg-red-50 pb-2 self-end">✕ Clear</button>
   </form>
   <a href="{{ route('bookings.create') }}" class="btn btn-primary">+ New Booking</a>
 </div>
