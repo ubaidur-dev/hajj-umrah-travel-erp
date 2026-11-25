@@ -17,6 +17,12 @@ class InvoiceController extends Controller
         if ($r->status) {
             $q->where('status', $r->status);
         }
+        if ($r->from) {
+            $q->whereDate('issue_date', '>=', $r->from);
+        }
+        if ($r->to) {
+            $q->whereDate('issue_date', '<=', $r->to);
+        }
         Search::apply($q, $r->q, ['invoice_no', 'notes'], [
             'customer' => ['name', 'phone', 'cnic', 'passport_no'], 'booking' => ['booking_no', 'title'],
         ], ['invoice_no', '(select name from customers where customers.id = invoices.customer_id)']);
