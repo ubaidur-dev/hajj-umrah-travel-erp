@@ -3,7 +3,7 @@
 @section('content')
 <div class="card card-b flex flex-wrap items-end justify-between gap-3">
   <form data-auto class="flex flex-wrap gap-2 items-end"><input name="q" value="{{ request('q') }}" placeholder="Search expense, category, reference…" class="inp w-64" autocomplete="off" spellcheck="false"><select name="category" class="inp w-44"><option value="">All categories</option>@foreach($categories as $k)<option value="{{ $k }}" @selected(request('category')==$k)>{{ \App\Models\Expense::CATEGORIES[$k] ?? ucfirst($k) }}</option>@endforeach</select>
-    <input type="date" name="from" value="{{ request('from') }}" class="inp w-40"><input type="date" name="to" value="{{ request('to') }}" class="inp w-40"><button class="btn btn-light">Filter</button></form>
+    <label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">From<input type="date" name="from" value="{{ request('from') }}" class="inp w-40"></label><label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">To<input type="date" name="to" value="{{ request('to') }}" class="inp w-40"></label><button type="button" data-reset hidden class="btn btn-light !text-red-600 hover:!bg-red-50 pb-2 self-end">✕ Clear</button></form>
   <div class="flex items-center gap-4"><span class="text-sm" data-live>Total: <b class="text-lg text-red-600">{{ money($total) }}</b></span><a href="{{ route('expenses.create') }}" class="btn btn-primary">+ Add Expense</a></div>
 </div>
 <div class="card overflow-x-auto" data-live><table class="tbl"><thead><tr><th>Date</th><th>Category</th><th>Title</th><th class="text-right">Amount</th><th></th></tr></thead><tbody>
