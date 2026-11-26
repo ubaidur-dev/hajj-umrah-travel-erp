@@ -6,7 +6,7 @@
     <input name="q" value="{{ request('q') }}" placeholder="Search name or mobile…" class="inp w-64" data-suggest="leads" autocomplete="off" spellcheck="false">
     <select name="status" class="inp w-40"><option value="">Open leads</option>@foreach(\App\Models\Lead::STATUSES as $k=>$v)<option value="{{ $k }}" @selected(request('status')==$k)>{{ $v }}</option>@endforeach</select>
     <label class="text-sm flex items-center gap-1 pb-2.5"><input type="checkbox" name="due" value="1" @checked(request('due'))> Follow-up due</label>
-    <button class="btn btn-light">Filter</button>
+    <button type="button" data-reset hidden class="btn btn-light !text-red-600 hover:!bg-red-50 pb-2 self-end">✕ Clear</button>
   </form>
   <a href="{{ route('leads.create') }}" class="btn btn-primary">+ Add Lead</a>
 </div>
