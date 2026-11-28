@@ -2,8 +2,8 @@
 @section('title', 'Invoices')
 @section('content')
 <div class="card card-b flex flex-wrap items-center justify-between gap-3">
-  <form data-auto class="flex gap-2"><input name="q" value="{{ request('q') }}" placeholder="Invoice no, customer, mobile…" class="inp w-64" data-suggest="invoices" autocomplete="off" spellcheck="false">
-    <select name="status" class="inp w-36"><option value="">All</option>@foreach(['unpaid','partial','paid','cancelled'] as $s)<option value="{{ $s }}" @selected(request('status')==$s)>{{ ucfirst($s) }}</option>@endforeach</select><button class="btn btn-light">Filter</button></form>
+  <form data-auto class="flex flex-wrap gap-2 items-end"><input name="q" value="{{ request('q') }}" placeholder="Invoice no, customer, mobile…" class="inp w-64" data-suggest="invoices" autocomplete="off" spellcheck="false">
+    <select name="status" class="inp w-36"><option value="">All statuses</option>@foreach(['unpaid','partial','paid','cancelled'] as $s)<option value="{{ $s }}" @selected(request('status')==$s)>{{ ucfirst($s) }}</option>@endforeach</select><label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">From<input type="date" name="from" value="{{ request('from') }}" class="inp w-40"></label><label class="flex items-center gap-1.5 text-xs font-medium text-slate-500">To<input type="date" name="to" value="{{ request('to') }}" class="inp w-40"></label><button type="button" data-reset hidden class="btn btn-light !text-red-600 hover:!bg-red-50 pb-2 self-end">✕ Clear</button></form>
   <a href="{{ route('invoices.create') }}" class="btn btn-primary">+ Manual Invoice</a>
 </div>
 <div class="card overflow-x-auto" data-live><table class="tbl"><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Booking</th><th class="text-right">Total</th><th class="text-right">Paid</th><th class="text-right">Balance</th><th>Status</th><th></th></tr></thead><tbody>
